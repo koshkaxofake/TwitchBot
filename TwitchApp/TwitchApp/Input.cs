@@ -300,6 +300,17 @@ namespace TwitchApp
 
       SendInput(1, Inputs, INPUT.Size);
     }
+    public static void LeftMouseHold(bool down)
+    {
+      INPUT[] Inputs = new INPUT[1];
+      INPUT Input = new INPUT();
+
+      Input.type = 0;
+      Input.U.mi.dwFlags = down ? MOUSEEVENTF.LEFTDOWN : MOUSEEVENTF.LEFTUP;
+      Inputs[0] = Input;
+
+      SendInput(1, Inputs, INPUT.Size);
+    }
     public static void LeftMouseClick()
     {
       INPUT[] Inputs = new INPUT[1];
