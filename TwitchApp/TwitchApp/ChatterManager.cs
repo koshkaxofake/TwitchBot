@@ -50,10 +50,12 @@ namespace TwitchApp
     //gives all active users points
     public void GivePoints(UInt32 points)
     {
+            mutex.WaitOne();
       foreach (var user in activeUsers)
       {
         user.Value.GetPoints(points);
       }
+            mutex.ReleaseMutex();
     }
     //give a specific user points
     public void GivePoints(string username, UInt32 points)
@@ -131,7 +133,7 @@ namespace TwitchApp
       //update time spent
       chatman.timeChatting += (UInt32)(DateTime.UtcNow - chatman.timeJoined).TotalSeconds;
     }
-    public void OnMessage(string username, OnMessageReceivedArgs e)
+    public void OnMessage(string username, MessageData e)
     {
       Chatter chatman;
       if (chatMap.ContainsKey(username) == false)
@@ -143,7 +145,7 @@ namespace TwitchApp
         chatman = chatMap[username];
       }
       chatman.messageNum += 1;
-      chatman.userId = e.ChatMessage.UserId;
+      chatman.userId = e.UserId;
     }
     //does web request dont call very often
     public void CheckForFollowers()

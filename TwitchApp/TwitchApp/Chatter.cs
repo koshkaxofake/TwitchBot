@@ -20,6 +20,8 @@ namespace TwitchApp
     public UInt32 messageNum;
     //does the chatter follow my channel
     public UInt32 isFollower;
+    //are they subbed
+    public UInt32 isSub;
 
     // Temp data
 
@@ -52,6 +54,17 @@ namespace TwitchApp
       else
       {
         isFollower = 0;
+      }
+    }
+    public void UpdateSub(bool doesSub)
+    {
+      if (doesSub)
+      {
+        isSub = 1;
+      }
+      else
+      {
+        isSub = 0;
       }
     }
     public Chatter(string data)
@@ -91,6 +104,11 @@ namespace TwitchApp
         //error
         Console.WriteLine("oh no");
       }
+      if (!UInt32.TryParse(args[index++], out isSub))
+      {
+        //error
+        Console.WriteLine("oh no");
+      }
 
       //in case there is no user id?
       if (userId == "")
@@ -105,7 +123,7 @@ namespace TwitchApp
     }
     public string save()
     {
-      return username + "," + userId + "," + totalPoints.ToString() + "," + points.ToString() + "," + timeChatting.ToString() + "," + messageNum.ToString() + "," + isFollower.ToString();
+      return username + "," + userId + "," + totalPoints.ToString() + "," + points.ToString() + "," + timeChatting.ToString() + "," + messageNum.ToString() + "," + isFollower.ToString() + "," + isSub.ToString();
     }
   }
 }

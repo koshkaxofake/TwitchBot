@@ -19,19 +19,19 @@ namespace TwitchApp
     {
       return 99999999;
     }
-    public virtual void CostExplain(string args, OnMessageReceivedArgs e)
+    public virtual void CostExplain(string args, MessageData e)
     {
-      bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "this command cost " + cost().ToString() + " points");
+      bot.client.SendMessage(e.Channel, "this command cost " + cost().ToString() + " points");
     }
-    public virtual void Execute(string args, OnMessageReceivedArgs e)
+    public virtual void Execute(string args, MessageData e)
     {
       Console.WriteLine("error no command... "+args);
     }
-    public void ExecuteCommand(string args, OnMessageReceivedArgs e)
+    public void ExecuteCommand(string args, MessageData e)
     {
-      if (SpendPoints(e.ChatMessage.Username) == false)
+      if (SpendPoints(e.Username) == false)
       {
-        bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "Not enough points, you have " + bot.chatManager.numPoints(e.ChatMessage.Username).ToString() + " you need " + cost().ToString() + " points");
+        bot.client.SendMessage(e.Channel, "Not enough points, you have " + bot.chatManager.numPoints(e.Username).ToString() + " you need " + cost().ToString() + " points");
         return;
       }
       Execute(args, e);
@@ -49,9 +49,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 120 * multiplyer;
+      return 1200 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       string msg = com;
       if (msg.Length > 100)
@@ -83,7 +83,7 @@ namespace TwitchApp
     {
       return 0;
     }
-    public override void Execute(string args, OnMessageReceivedArgs e)
+    public override void Execute(string args, MessageData e)
     {
       bot.soundInterface.Clear();
     }
@@ -97,9 +97,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 15 * multiplyer;
+      return 1000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       string msg = com;
       if (msg.Length > 100)
@@ -119,7 +119,7 @@ namespace TwitchApp
     {
       return 10* multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       string[] mouse_params = com.Split(" ");
       //mouse move x y
@@ -162,9 +162,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 120* multiplyer;
+      return 1200* multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       string msg = com;
       if (msg.Length > 100)
@@ -186,7 +186,7 @@ namespace TwitchApp
     {
       return 5 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardwareHold("shift");
       Input.SendInputWithAPIHardware("enter");
@@ -211,7 +211,7 @@ namespace TwitchApp
     {
       return 600;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       //format play soundname
       string[] image_params = com.Split(" ");
@@ -230,9 +230,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 20 * multiplyer;
+      return 1000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("q");
     }
@@ -245,9 +245,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 20 * multiplyer;
+      return 1000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("w");
     }
@@ -260,9 +260,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 20 * multiplyer;
+      return 1000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("e");
     }
@@ -275,9 +275,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 69* multiplyer;
+      return 1000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("r");
     }
@@ -290,9 +290,9 @@ namespace TwitchApp
     }
     public override UInt32 cost()
     {
-      return 100 * multiplyer;
+      return 10000 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("f");
     }
@@ -307,7 +307,7 @@ namespace TwitchApp
     {
       return 10 * multiplyer;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       Input.SendInputWithAPIHardware("v");
       Thread.Sleep(3);
@@ -318,6 +318,30 @@ namespace TwitchApp
       Input.LeftMouseHold(false);
     }
   }
+  class GivePoints : Command
+  {
+        public GivePoints(Bot bott) : base(bott)
+        {
+
+        }
+        public override UInt32 cost()
+        {
+            return 0;
+        }
+        public override void Execute(string com, MessageData e)
+        {
+            if (e.IsBroadcaster)
+            {
+                //give username points
+                string[] args = com.Split(" ");
+                UInt32 points;
+                if (UInt32.TryParse(args[2], out points))
+                {
+                    bot.chatManager.GivePoints(args[1], points);
+                }
+            }
+        }
+    }
   class BetCommand : Command
   {
     Bet bet = new Bet();
@@ -329,27 +353,33 @@ namespace TwitchApp
     {
       return 0;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       //moderators make bets
-      if (e.ChatMessage.IsModerator || e.ChatMessage.IsBroadcaster)
+      string command = com.Split(' ')[0];
+            bool test = true;
+      if ((/*e.IsModerator || */e.IsBroadcaster) && !(command == "bet" && bet.wagers.Count > 0) && test)
       {
-        string command = com.Split(' ')[0];
         if (command == "bet")
         {
+          if (bet.wagers.Count > 0)
+          {
+            bot.client.SendMessage(e.Channel, "Bet already exists");
+            return;
+          }
           bet = new Bet();
           bet.BetsOpen = true;
           //bet command will be structured as (bet option 1, option 2, ..)
           string[] args = com.Substring(command.Length + 1).Split(',');
           foreach (string arg in args)
           {
-            bet.options.Add(arg);
+            bet.options.Add(arg.Replace(" ", ""));
           }
-          bot.client.SendMessage(e.ChatMessage.Channel, "Betting is open");
+          bot.client.SendMessage(e.Channel, "Betting is open");
         }
         else if (command == "betstop")
         {
-          bot.client.SendMessage(e.ChatMessage.Channel, "Betting is closed");
+          bot.client.SendMessage(e.Channel, "Betting is closed");
           bet.BetsOpen = false;
         }
         else if (command == "win")
@@ -375,7 +405,9 @@ namespace TwitchApp
             if (wagers.Value.Key == index)
             {
               //winner, give them money
-              bot.chatManager.GivePoints(wagers.Key, wagers.Value.Value * 2);
+              uint momeys = wagers.Value.Value * 4;
+              bot.chatManager.GivePoints(wagers.Key, momeys);
+              bot.client.SendWhisper(wagers.Key, "Congrats u r winner. u get " + momeys.ToString() + " points");
             }
             else
             {
@@ -392,7 +424,7 @@ namespace TwitchApp
         //check if there is a bet
         if (bet.options.Count == 0 || bet.BetsOpen == false)
         {
-          bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "Betting is not open right now");
+          bot.client.SendMessage(e.Channel, "Betting is not open right now");
           return;
         }
         //format of non-mod bet command (bet option amount)
@@ -400,7 +432,7 @@ namespace TwitchApp
         if (args.Length != 3)
         {
           //todo add message
-          bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "invalid bet");
+          bot.client.SendMessage(e.Channel, "invalid bet");
           return;
         }
         //get the option they are betting for
@@ -422,16 +454,21 @@ namespace TwitchApp
         if (UInt32.TryParse(args[2], out amount) == false)
         {
           //todo add error message
-          bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "invalid bet");
+          bot.client.SendMessage(e.Channel, "invalid bet");
           return;
         }
-        if (bot.chatManager.SpendPoints(e.ChatMessage.Username, amount))
+        if (bet.wagers.ContainsKey(e.Username))
         {
-          bet.wagers.Add(e.ChatMessage.Username, new KeyValuePair<uint, uint>(index, amount));
+          bot.client.SendMessage(e.Channel, "you already placed a bet");
+          return;
+        }
+        if (bot.chatManager.SpendPoints(e.Username, amount))
+        {
+          bet.wagers.Add(e.Username, new KeyValuePair<uint, uint>(index, amount));
         }
         else
         {
-          bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "You dont got enough points bro, " + bot.chatManager.numPoints(e.ChatMessage.Username).ToString());
+          bot.client.SendMessage(e.Channel, "You dont got enough points bro, " + bot.chatManager.numPoints(e.Username).ToString());
         }
       }
     }
@@ -446,9 +483,9 @@ namespace TwitchApp
     {
       return 0;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
-      bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "you have " + bot.chatManager.numPoints(e.ChatMessage.Username).ToString() + " points");
+      bot.client.SendMessage(e.Channel, "you have " + bot.chatManager.numPoints(e.Username).ToString() + " points");
     }
   }
   class ImageCommand : Command
@@ -469,11 +506,76 @@ namespace TwitchApp
     {
       return 500;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       string image = com.Substring(6);
       if (imageDic.ContainsKey(image))
         bot.AddHtml("<HTML><img src=\"" + imageDic[image] + "\"style=\"width:250px;height:auto;\"><meta http-equiv=\"refresh\" content=\"5\"></HTML>");
+    }
+  }
+  // !tts bla bla bla
+  class TTSCommand : Command
+  {
+    DateTime lastPlayed = DateTime.Now;
+    int cooldown = 20;
+    public TTSCommand(Bot bott) : base(bott)
+    {
+    }
+    public override void CostExplain(string com, MessageData e)
+    {
+      string text = com.Substring(5);
+      bot.client.SendMessage(e.Channel, "This command will cost " + (text.Length).ToString());
+    }
+    public override UInt32 cost()
+    {
+      return 0;
+    }
+    public override void Execute(string com, MessageData e)
+    {
+      if ((DateTime.Now - lastPlayed).TotalSeconds < cooldown)
+      {
+        bot.client.SendMessage(e.Channel, "You san only say one thing at a time, wait like " + (cooldown - (DateTime.Now - lastPlayed).TotalSeconds) + " seconds");
+        return;
+      }
+      string text = com.Substring(4);
+      if (!bot.chatManager.SpendPoints(e.Username, (uint)text.Length))
+      {
+        bot.client.SendMessage(e.Channel, "Not enough points to say that, you have " + bot.chatManager.numPoints(e.Username).ToString() + " you need " + (text.Length).ToString() + " points");
+        return;
+      }
+      bot.soundInterface.AddTTS(text);
+      lastPlayed = DateTime.Now;
+    }
+  }
+
+  class Erotic : Command
+  {
+    List<string> msg;
+    Random rand = new Random();
+    DateTime lastPlayed = DateTime.Now;
+    int cooldown = 60;
+    public Erotic(Bot bott, List<string> ero) : base(bott)
+    {
+      msg = ero;
+    }
+    public override UInt32 cost()
+    {
+      return 300;
+    }
+    public override void Execute(string com, MessageData e)
+    {
+      if ((DateTime.Now - lastPlayed).TotalSeconds < cooldown)
+      {
+        bot.client.SendMessage(e.Channel, "You literally just came bro, you got to wait a minute or two");
+        return;
+      }
+      if (!bot.chatManager.SpendPoints(e.Username, cost()))
+      {
+        bot.client.SendMessage(e.Channel, "Not enough points for that command you horny bastard");
+        return;
+      }
+      bot.soundInterface.AddTTS(msg[rand.Next(msg.Count)]);
+      lastPlayed = DateTime.Now;
     }
   }
 
@@ -483,19 +585,19 @@ namespace TwitchApp
     {
 
     }
-    public override void CostExplain(string com, OnMessageReceivedArgs e)
+    public override void CostExplain(string com, MessageData e)
     {
       string[] args = com.Split(' ');
       int lendth = 0;
       if (int.TryParse(args[args.Length - 1], out lendth))
       {
         string video_length = args[args.Length - 1] + "000";
-        bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "This video will cost "+ (lendth*10).ToString());
+        bot.client.SendMessage(e.Channel, "This video will cost "+ (lendth*10).ToString());
 
       }
       else
       {
-        bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "Youtube video will cost 10 points per second of video, be default it plays 30 seconds");
+        bot.client.SendMessage(e.Channel, "Youtube video will cost 10 points per second of video, be default it plays 30 seconds");
       }
     }
     public override UInt32 cost()
@@ -503,7 +605,7 @@ namespace TwitchApp
       //as cost depending on length
       return 0;
     }
-    public override void Execute(string com, OnMessageReceivedArgs e)
+    public override void Execute(string com, MessageData e)
     {
       //video url
       string[] args = com.Split(' ');
@@ -568,9 +670,9 @@ namespace TwitchApp
       UInt32 vidLength;
       if (UInt32.TryParse(video_length, out vidLength))
       {
-        if (!bot.chatManager.SpendPoints(e.ChatMessage.Username, vidLength/10))
+        if (!bot.chatManager.SpendPoints(e.Username, vidLength/10))
         {
-          bot.client.SendReply(e.ChatMessage.Channel, e.ChatMessage.Id, "Not enough points to play that video, you have " + bot.chatManager.numPoints(e.ChatMessage.Username).ToString() + " you need " + (vidLength / 10).ToString() + " points");
+          bot.client.SendMessage(e.Channel, "Not enough points to play that video, you have " + bot.chatManager.numPoints(e.Username).ToString() + " you need " + (vidLength / 10).ToString() + " points");
           return;
         }
       }

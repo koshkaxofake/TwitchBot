@@ -19,6 +19,8 @@ using NAudio.Wave;
 using System.Windows.Forms;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users;
+using System.Speech.Synthesis;
+using System.Net.Sockets;
 
 /// <summary>
 /// 
@@ -71,6 +73,7 @@ namespace TwitchApp
     }
     static void Main(string[] args)                                                    
     {
+      //get token for helix
       string scopes = "analytics:read:extensions analytics:read:games bits:read channel:edit:commercial channel:manage:broadcast channel:manage:extensions channel:manage:polls channel:manage:predictions channel:manage:redemptions channel:manage:schedule channel:manage:videos channel:read:editors channel:read:goals channel:read:hype_train channel:read:polls channel:read:predictions channel:read:redemptions channel:read:stream_key channel:read:subscriptions clips:edit moderation:read moderator:manage:banned_users moderator:read:blocked_terms moderator:manage:blocked_terms moderator:manage:automod moderator:read:automod_settings moderator:manage:automod_settings moderator:read:chat_settings moderator:manage:chat_settings user:edit user:edit:follows user:manage:blocked_users user:read:blocked_users user:read:broadcast user:read:email user:read:follows user:read:subscriptions";
       string requestUri = "https://id.twitch.tv/oauth2/token?client_id=" + SecretDontOpenOnStreamFile.ClientId() + "&client_secret=" + SecretDontOpenOnStreamFile.ClientSecret() + "&scope=" + scopes + "&grant_type=client_credentials";
       

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Speech.Synthesis;
 
 namespace TwitchApp
 {
@@ -11,6 +12,8 @@ namespace TwitchApp
   {
     Mutex mut = new Mutex();
     List<string> sound_queue = new List<string>();
+    List<string> tts_queue = new List<string>();
+    TTS tts = new TTS();
     public void AddSound(string sound)
     {
       mut.WaitOne();
@@ -21,6 +24,18 @@ namespace TwitchApp
     {
       mut.WaitOne();
       sound_queue.Insert(0,sound);
+      mut.ReleaseMutex();
+    }
+    public void AddTTS(string text)
+    {
+      mut.WaitOne();
+      tts_queue.Add(text);
+      mut.ReleaseMutex();
+    }
+    public void AddTTSFront(string text)
+    {
+      mut.WaitOne();
+      tts_queue.Insert(0, text);
       mut.ReleaseMutex();
     }
     public void Clear()
@@ -40,6 +55,22 @@ namespace TwitchApp
       }
       mut.ReleaseMutex();
       return next;
+    }
+    string GetNextTTS()
+    {
+      string next = "";
+      mut.WaitOne();
+      if (tts_queue.Count > 0)
+      {
+        next = tts_queue[0];
+        tts_queue.Remove(next);
+      }
+      mut.ReleaseMutex();
+      return next;
+    }
+    void PlayText(string text)
+    {
+      tts.Speak(text);
     }
     public void SoundLoop()
     {
@@ -65,6 +96,10 @@ namespace TwitchApp
               }
             }
           }
+        }
+        else if ((sound = GetNextTTS()) != "")
+        {
+          PlayText(sound);
         }
         else
         {
